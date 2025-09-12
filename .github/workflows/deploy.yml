@@ -31,52 +31,48 @@ jobs:
 
       - name: Deploy frontend (Production)
         if: env.DEPLOY_ENV == 'production'
-        uses: burnett01/rsync-deployments@5.1
+        uses: appleboy/scp-action@v0.1.7
         with:
-          switches: -avzr --delete
-          path: frontend/build/
-          remote_path: ${{ env.CPANEL_HOME }}/public_html/
-          remote_host: ${{ secrets.CPANEL_HOST }}
-          remote_user: ${{ secrets.CPANEL_USER }}
-          remote_key: ${{ secrets.CPANEL_KEY }}
-          remote_port: ${{ secrets.CPANEL_PORT }}
+          host: ${{ secrets.CPANEL_HOST }}
+          username: ${{ secrets.CPANEL_USER }}
+          key: ${{ secrets.CPANEL_KEY }}
+          port: ${{ secrets.CPANEL_PORT }}
+          source: "frontend/build/*"
+          target: "${{ env.CPANEL_HOME }}/public_html/"
 
       - name: Deploy frontend (Staging)
         if: env.DEPLOY_ENV == 'staging'
-        uses: burnett01/rsync-deployments@5.1
+        uses: appleboy/scp-action@v0.1.7
         with:
-          switches: -avzr --delete
-          path: frontend/build/
-          remote_path: ${{ env.CPANEL_HOME }}/staging_frontend/
-          remote_host: ${{ secrets.CPANEL_HOST }}
-          remote_user: ${{ secrets.CPANEL_USER }}
-          remote_key: ${{ secrets.CPANEL_KEY }}
-          remote_port: ${{ secrets.CPANEL_PORT }}
+          host: ${{ secrets.CPANEL_HOST }}
+          username: ${{ secrets.CPANEL_USER }}
+          key: ${{ secrets.CPANEL_KEY }}
+          port: ${{ secrets.CPANEL_PORT }}
+          source: "frontend/build/*"
+          target: "${{ env.CPANEL_HOME }}/staging_frontend/"
 
       # ------------------ BACKEND ------------------
       - name: Deploy backend (Production)
         if: env.DEPLOY_ENV == 'production'
-        uses: burnett01/rsync-deployments@5.1
+        uses: appleboy/scp-action@v0.1.7
         with:
-          switches: -avzr --delete --exclude=node_modules
-          path: backend/
-          remote_path: ${{ env.CPANEL_HOME }}/myapp/
-          remote_host: ${{ secrets.CPANEL_HOST }}
-          remote_user: ${{ secrets.CPANEL_USER }}
-          remote_key: ${{ secrets.CPANEL_KEY }}
-          remote_port: ${{ secrets.CPANEL_PORT }}
+          host: ${{ secrets.CPANEL_HOST }}
+          username: ${{ secrets.CPANEL_USER }}
+          key: ${{ secrets.CPANEL_KEY }}
+          port: ${{ secrets.CPANEL_PORT }}
+          source: "backend/*"
+          target: "${{ env.CPANEL_HOME }}/myapp/"
 
       - name: Deploy backend (Staging)
         if: env.DEPLOY_ENV == 'staging'
-        uses: burnett01/rsync-deployments@5.1
+        uses: appleboy/scp-action@v0.1.7
         with:
-          switches: -avzr --delete --exclude=node_modules
-          path: backend/
-          remote_path: ${{ env.CPANEL_HOME }}/myapp_staging/
-          remote_host: ${{ secrets.CPANEL_HOST }}
-          remote_user: ${{ secrets.CPANEL_USER }}
-          remote_key: ${{ secrets.CPANEL_KEY }}
-          remote_port: ${{ secrets.CPANEL_PORT }}
+          host: ${{ secrets.CPANEL_HOST }}
+          username: ${{ secrets.CPANEL_USER }}
+          key: ${{ secrets.CPANEL_KEY }}
+          port: ${{ secrets.CPANEL_PORT }}
+          source: "backend/*"
+          target: "${{ env.CPANEL_HOME }}/myapp_staging/"
 
       - name: Install backend dependencies & restart app
         uses: appleboy/ssh-action@v0.1.10
