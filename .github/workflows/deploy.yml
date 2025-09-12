@@ -1,0 +1,63 @@
+name: Deploy Fullstack App (Production & Staging)
+
+on:
+  push:
+    branches:
+      - main
+      - staging
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      # ------------------ FRONTEND ------------------
+      - name: Install frontend dependencies
+        run: |
+          cd frontend
+          npm install
+
+      - name: Build React app
+        run: |
+          cd frontend
+          npm run build
+
+      - name: Deploy frontend
+        uses: burnett01/rsync-deployments@5.1
+        with:
+          switches: -avzr --delete
+          path: frontend/build/
+          remote_path: ${{ github.ref == 'refs/heads/main' && format('/home/{0}/public_html/', secrets.CPANEL_USER) || format('/home/{0}/staging_frontend/', secrets.CPANEL_USER) }}
+          remote_host: ${{ secrets.CPANEL_HOST }}
+          remote_user: ${{ secrets.CPANEL_USER }}
+          remote_key: ${{ secrets.CPANEL_KEY }}
+          remote_port: ${{ secrets.CPANEL_PORT }}
+
+      # ------------------ BACKEND ------------------
+      - name: Deploy backend
+        uses: burnett01/rsync-deployments@5.1
+        with:
+          switches: -avzr --delete --exclude=node_modules
+          path: backend/
+          remote_path: ${{ github.ref == 'refs/heads/main' && format('/home/{0}/myapp/', secrets.CPANEL_USER) || format('/home/{0}/myapp_staging/', secrets.CPANEL_USER) }}
+          remote_host: ${{ secrets.CPANEL_HOST }}
+          remote_user: ${{ secrets.CPANEL_USER }}
+          remote_key: ${{ secrets.CPANEL_KEY }}
+          remote_port: ${{ secrets.CPANEL_PORT }}
+
+      - name: Install backend dependencies & restart app
+        run: |
+          ssh -o StrictHostKeyChecking=no -p ${{ secrets.CPANEL_PORT }} \
+          ${{ secrets.CPANEL_USER }}@${{ secrets.CPANEL_HOST }} << 'EOF'
+            if [ "${GITHUB_REF}" = "refs/heads/main" ]; then
+              cd /home/${{ secrets.CPANEL_USER }}/myapp
+            else
+              cd /home/${{ secrets.CPANEL_USER }}/myapp_staging
+            fi
+            npm install --production
+            mkdir -p tmp
+            touch tmp/restart.txt
+          EOF

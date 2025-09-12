@@ -1,6 +1,6 @@
-/.github
-.github/workflows/deploy.yml
-.rsyncignore
+# /.github
+# .github/workflows/deploy.yml
+# .rsyncignore
 
 /backend/.env
 /backend/node_modules
