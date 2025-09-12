@@ -10,6 +10,10 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
 
+    env:
+      DEPLOY_ENV: ${{ github.ref == 'refs/heads/main' && 'production' || 'staging' }}
+      CPANEL_HOME: /home/${{ secrets.CPANEL_USER }}
+
     steps:
       - name: Checkout repo
         uses: actions/checkout@v3
@@ -25,24 +29,50 @@ jobs:
           cd frontend
           npm run build
 
-      - name: Deploy frontend
+      - name: Deploy frontend (Production)
+        if: env.DEPLOY_ENV == 'production'
         uses: burnett01/rsync-deployments@5.1
         with:
           switches: -avzr --delete
           path: frontend/build/
-          remote_path: ${{ github.ref == 'refs/heads/main' && format('/home/{0}/public_html/', secrets.CPANEL_USER) || format('/home/{0}/staging_frontend/', secrets.CPANEL_USER) }}
+          remote_path: ${{ env.CPANEL_HOME }}/public_html/
+          remote_host: ${{ secrets.CPANEL_HOST }}
+          remote_user: ${{ secrets.CPANEL_USER }}
+          remote_key: ${{ secrets.CPANEL_KEY }}
+          remote_port: ${{ secrets.CPANEL_PORT }}
+
+      - name: Deploy frontend (Staging)
+        if: env.DEPLOY_ENV == 'staging'
+        uses: burnett01/rsync-deployments@5.1
+        with:
+          switches: -avzr --delete
+          path: frontend/build/
+          remote_path: ${{ env.CPANEL_HOME }}/staging_frontend/
           remote_host: ${{ secrets.CPANEL_HOST }}
           remote_user: ${{ secrets.CPANEL_USER }}
           remote_key: ${{ secrets.CPANEL_KEY }}
           remote_port: ${{ secrets.CPANEL_PORT }}
 
       # ------------------ BACKEND ------------------
-      - name: Deploy backend
+      - name: Deploy backend (Production)
+        if: env.DEPLOY_ENV == 'production'
         uses: burnett01/rsync-deployments@5.1
         with:
           switches: -avzr --delete --exclude=node_modules
           path: backend/
-          remote_path: ${{ github.ref == 'refs/heads/main' && format('/home/{0}/myapp/', secrets.CPANEL_USER) || format('/home/{0}/myapp_staging/', secrets.CPANEL_USER) }}
+          remote_path: ${{ env.CPANEL_HOME }}/myapp/
+          remote_host: ${{ secrets.CPANEL_HOST }}
+          remote_user: ${{ secrets.CPANEL_USER }}
+          remote_key: ${{ secrets.CPANEL_KEY }}
+          remote_port: ${{ secrets.CPANEL_PORT }}
+
+      - name: Deploy backend (Staging)
+        if: env.DEPLOY_ENV == 'staging'
+        uses: burnett01/rsync-deployments@5.1
+        with:
+          switches: -avzr --delete --exclude=node_modules
+          path: backend/
+          remote_path: ${{ env.CPANEL_HOME }}/myapp_staging/
           remote_host: ${{ secrets.CPANEL_HOST }}
           remote_user: ${{ secrets.CPANEL_USER }}
           remote_key: ${{ secrets.CPANEL_KEY }}
@@ -56,10 +86,10 @@ jobs:
           key: ${{ secrets.CPANEL_KEY }}
           port: ${{ secrets.CPANEL_PORT }}
           script: |
-            if [ "${GITHUB_REF}" = "refs/heads/main" ]; then
-              cd /home/${{ secrets.CPANEL_USER }}/myapp
+            if [ "${DEPLOY_ENV}" = "production" ]; then
+              cd $CPANEL_HOME/myapp
             else
-              cd /home/${{ secrets.CPANEL_USER }}/myapp_staging
+              cd $CPANEL_HOME/myapp_staging
             fi
             npm install --production
             mkdir -p tmp
