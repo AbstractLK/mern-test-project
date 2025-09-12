@@ -30,19 +30,19 @@ jobs:
         with:
           switches: -avzr --delete
           path: frontend/build/
-          remote_path: ${{ github.ref == 'refs/heads/main' && '/home/' + secrets.CPANEL_USER + '/public_html/' || '/home/' + secrets.CPANEL_USER + '/staging_frontend/' }}
+          remote_path: ${{ github.ref == 'refs/heads/main' && format('/home/{0}/public_html/', secrets.CPANEL_USER) || format('/home/{0}/staging_frontend/', secrets.CPANEL_USER) }}
           remote_host: ${{ secrets.CPANEL_HOST }}
           remote_user: ${{ secrets.CPANEL_USER }}
           remote_key: ${{ secrets.CPANEL_KEY }}
           remote_port: ${{ secrets.CPANEL_PORT }}
 
       # ------------------ BACKEND ------------------
-      - name: Deploy backend files
+      - name: Deploy backend
         uses: burnett01/rsync-deployments@5.1
         with:
           switches: -avzr --delete --exclude=node_modules
           path: backend/
-          remote_path: ${{ github.ref == 'refs/heads/main' && '/home/' + secrets.CPANEL_USER + '/myapp/' || '/home/' + secrets.CPANEL_USER + '/myapp_staging/' }}
+          remote_path: ${{ github.ref == 'refs/heads/main' && format('/home/{0}/myapp/', secrets.CPANEL_USER) || format('/home/{0}/myapp_staging/', secrets.CPANEL_USER) }}
           remote_host: ${{ secrets.CPANEL_HOST }}
           remote_user: ${{ secrets.CPANEL_USER }}
           remote_key: ${{ secrets.CPANEL_KEY }}
