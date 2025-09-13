@@ -41,7 +41,7 @@ jobs:
         if: env.DEPLOY_ENV == 'production'
         uses: appleboy/scp-action@v0.1.7
         with:
-          source: "frontend/build/**"
+          source: "frontend/build/"
           target: "${{ env.CPANEL_HOME }}/public_html/"
           host: ${{ secrets.CPANEL_HOST }}
           username: ${{ secrets.CPANEL_USER }}
@@ -52,7 +52,7 @@ jobs:
         if: env.DEPLOY_ENV == 'staging'
         uses: appleboy/scp-action@v0.1.7
         with:
-          source: "frontend/build/**"
+          source: "frontend/build/"
           target: "${{ env.CPANEL_HOME }}/staging_frontend/"
           host: ${{ secrets.CPANEL_HOST }}
           username: ${{ secrets.CPANEL_USER }}
@@ -64,7 +64,7 @@ jobs:
         if: env.DEPLOY_ENV == 'production'
         uses: appleboy/scp-action@v0.1.7
         with:
-          source: "backend/**"
+          source: "backend/"
           target: "${{ env.CPANEL_HOME }}/myapp/"
           host: ${{ secrets.CPANEL_HOST }}
           username: ${{ secrets.CPANEL_USER }}
@@ -75,7 +75,7 @@ jobs:
         if: env.DEPLOY_ENV == 'staging'
         uses: appleboy/scp-action@v0.1.7
         with:
-          source: "backend/**"
+          source: "backend/"
           target: "${{ env.CPANEL_HOME }}/myapp_staging/"
           host: ${{ secrets.CPANEL_HOST }}
           username: ${{ secrets.CPANEL_USER }}
