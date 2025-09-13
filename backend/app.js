@@ -1,5 +1,6 @@
 const fs = require('fs');
 const path = require('path');
+const port = process.env.PORT || 3001;
 require('dotenv').config()
 
 const express = require('express');
@@ -88,7 +89,9 @@ mongoose.connect(
       console.error(err);
     } else {
       console.log('CONNECTED TO MONGODB!!');
-      app.listen(80);
+      app.listen(port, () => {
+        console.log(`Server listening on port ${port}`);
+      });
     }
   }
 );

@@ -33,48 +33,49 @@ jobs:
         if: env.DEPLOY_ENV == 'production'
         uses: appleboy/scp-action@v0.1.7
         with:
+          source: "frontend/build/*"
+          target: "${{ env.CPANEL_HOME }}/public_html/"
           host: ${{ secrets.CPANEL_HOST }}
           username: ${{ secrets.CPANEL_USER }}
           key: ${{ secrets.CPANEL_KEY }}
           port: ${{ secrets.CPANEL_PORT }}
-          source: "frontend/build/*"
-          target: "${{ env.CPANEL_HOME }}/public_html/"
 
       - name: Deploy frontend (Staging)
         if: env.DEPLOY_ENV == 'staging'
         uses: appleboy/scp-action@v0.1.7
         with:
+          source: "frontend/build/*"
+          target: "${{ env.CPANEL_HOME }}/staging_frontend/"
           host: ${{ secrets.CPANEL_HOST }}
           username: ${{ secrets.CPANEL_USER }}
           key: ${{ secrets.CPANEL_KEY }}
           port: ${{ secrets.CPANEL_PORT }}
-          source: "frontend/build/*"
-          target: "${{ env.CPANEL_HOME }}/staging_frontend/"
 
       # ------------------ BACKEND ------------------
       - name: Deploy backend (Production)
         if: env.DEPLOY_ENV == 'production'
         uses: appleboy/scp-action@v0.1.7
         with:
+          source: "backend/*"
+          target: "${{ env.CPANEL_HOME }}/myapp/"
           host: ${{ secrets.CPANEL_HOST }}
           username: ${{ secrets.CPANEL_USER }}
           key: ${{ secrets.CPANEL_KEY }}
           port: ${{ secrets.CPANEL_PORT }}
-          source: "backend/*"
-          target: "${{ env.CPANEL_HOME }}/myapp/"
 
       - name: Deploy backend (Staging)
         if: env.DEPLOY_ENV == 'staging'
         uses: appleboy/scp-action@v0.1.7
         with:
+          source: "backend/*"
+          target: "${{ env.CPANEL_HOME }}/myapp_staging/"
           host: ${{ secrets.CPANEL_HOST }}
           username: ${{ secrets.CPANEL_USER }}
           key: ${{ secrets.CPANEL_KEY }}
           port: ${{ secrets.CPANEL_PORT }}
-          source: "backend/*"
-          target: "${{ env.CPANEL_HOME }}/myapp_staging/"
 
-      - name: Install backend dependencies & restart app
+      # ------------------ RESTART APP ------------------
+      - name: Install backend dependencies & restart Passenger
         uses: appleboy/ssh-action@v0.1.10
         with:
           host: ${{ secrets.CPANEL_HOST }}
@@ -90,3 +91,4 @@ jobs:
             npm install --production
             mkdir -p tmp
             touch tmp/restart.txt
+            echo "🚀 Passenger app restarted!"
