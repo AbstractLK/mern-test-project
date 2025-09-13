@@ -1,6 +1,6 @@
 {
   "name": "docker-frontend",
-  "homepage": "http://staging.modernscene.lk",
+  "homepage": "https://staging.modernscene.lk",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
