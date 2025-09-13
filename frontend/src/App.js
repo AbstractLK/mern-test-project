@@ -4,7 +4,9 @@ import GoalInput from './components/goals/GoalInput';
 import CourseGoals from './components/goals/CourseGoals';
 import ErrorAlert from './components/UI/ErrorAlert';
 
-const backendUrl = process.env.NODE_ENV === 'development' ? 'http://localhost' : 'http://staging.modernscene.lk';
+// const backendUrl = process.env.NODE_ENV === 'development' ? 'http://localhost' : 'http://staging.modernscene.lk';
+const backendUrl = process.env.REACT_APP_BACKEND_URL;
+
 
 function App() {
   const [loadedGoals, setLoadedGoals] = useState([]);
