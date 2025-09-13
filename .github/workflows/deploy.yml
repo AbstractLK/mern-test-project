@@ -21,11 +21,11 @@ jobs:
       # ------------------ FRONTEND ------------------
       - name: Set frontend environment (staging)
         if: env.DEPLOY_ENV == 'staging'
-        run: echo "REACT_APP_BACKEND_URL=https://staging.modernscene.lk" > frontend/.env
+        run: echo "REACT_APP_BACKEND_URL=https://api-staging.modernscene.lk" > frontend/.env
 
       - name: Set frontend environment (production)
         if: env.DEPLOY_ENV == 'production'
-        run: echo "REACT_APP_BACKEND_URL=https://modernscene.lk" > frontend/.env
+        run: echo "REACT_APP_BACKEND_URL=https://api.modernscene.lk" > frontend/.env
 
       - name: Install frontend dependencies
         run: |
