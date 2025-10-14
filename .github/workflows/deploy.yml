@@ -18,6 +18,31 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v3
 
+      # ------------------ BACKEND ------------------
+      - name: Deploy backend (Production)
+        if: env.DEPLOY_ENV == 'production'
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          source: "backend/*"
+          target: "${{ env.CPANEL_HOME }}/myapp/"
+          strip_components: 1   # ✅ removes "backend/"
+          host: ${{ secrets.CPANEL_HOST }}
+          username: ${{ secrets.CPANEL_USER }}
+          key: ${{ secrets.CPANEL_KEY }}
+          port: ${{ secrets.CPANEL_PORT }}
+
+      - name: Deploy backend (Staging)
+        if: env.DEPLOY_ENV == 'staging'
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          source: "backend/*"
+          target: "${{ env.CPANEL_HOME }}/myapp_staging/"
+          strip_components: 1   # ✅ removes "backend/"
+          host: ${{ secrets.CPANEL_HOST }}
+          username: ${{ secrets.CPANEL_USER }}
+          key: ${{ secrets.CPANEL_KEY }}
+          port: ${{ secrets.CPANEL_PORT }}
+
       # ------------------ FRONTEND ------------------
       - name: Set frontend environment (staging)
         if: env.DEPLOY_ENV == 'staging'
@@ -65,30 +90,6 @@ jobs:
           key: ${{ secrets.CPANEL_KEY }}
           port: ${{ secrets.CPANEL_PORT }}
 
-      # ------------------ BACKEND ------------------
-      - name: Deploy backend (Production)
-        if: env.DEPLOY_ENV == 'production'
-        uses: appleboy/scp-action@v0.1.7
-        with:
-          source: "backend/*"
-          target: "${{ env.CPANEL_HOME }}/myapp/"
-          strip_components: 1   # ✅ removes "backend/"
-          host: ${{ secrets.CPANEL_HOST }}
-          username: ${{ secrets.CPANEL_USER }}
-          key: ${{ secrets.CPANEL_KEY }}
-          port: ${{ secrets.CPANEL_PORT }}
-
-      - name: Deploy backend (Staging)
-        if: env.DEPLOY_ENV == 'staging'
-        uses: appleboy/scp-action@v0.1.7
-        with:
-          source: "backend/*"
-          target: "${{ env.CPANEL_HOME }}/myapp_staging/"
-          strip_components: 1   # ✅ removes "backend/"
-          host: ${{ secrets.CPANEL_HOST }}
-          username: ${{ secrets.CPANEL_USER }}
-          key: ${{ secrets.CPANEL_KEY }}
-          port: ${{ secrets.CPANEL_PORT }}
 
       # ------------------ RESTART APP ------------------
       - name: Restart Passenger
